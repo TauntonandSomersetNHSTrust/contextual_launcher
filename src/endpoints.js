@@ -3,7 +3,6 @@ const verifyToken = require('./handlers/verify-token');
 const express = require('express');
 const router = express.Router();
 const utils = require('./utils/utils');
-const login = require('./api/login');
 const queryString = require('querystring');
 const obfuscate = require('./middlewares/obfuscate');
 const tokenExchange = require('./middlewares/token-exchange');
@@ -42,25 +41,15 @@ const launchRedirect = async (req, res, next) => {
   }
 };
 
-const openIDLogin = async (req, res, next) => {
-  const user = req.body;
-  const authentication = await login.passwordLogin(user.username, user.password);
-  if(authentication && authentication.status && authentication.status == 200) {
-    return res.status(200).json(authentication.data);
-  }
-  return res.status(400).json(authentication);
-};
-
 // Routes
 router.get('/launch', verifyToken, tokenExchange, obfuscate, asyncMiddleware(launchRedirect));
-router.post('/login/*', asyncMiddleware(openIDLogin));
+// router.post('/login/*', asyncMiddleware(openIDLogin));
 router.use('/status', asyncMiddleware((req, res, next) => {
   return res.json('OK').status(200);
 }))
 
 //Tests
 router.get('/test', asyncMiddleware(testEndpoint));
-router.get('/testy', verifyToken, asyncMiddleware(testEndpoint));
 router.get('/securetest', verifyToken, asyncMiddleware(testEndpoint));
 router.get('/stats', verifyToken, asyncMiddleware((req, res, next) => {
 	return res.status(200).json({

@@ -121,6 +121,8 @@ async function serviceTokenExchange(tokenUrl, subjectToken, user) {
 		audience: process.env.downstream_openIDTargetClient
 	};
 
+	logger.debug('Form data: ' + JSON.stringify(form, null, 4));
+
 	const formData = queryString.stringify(form);
 
   return new Promise((resolve, reject) => {

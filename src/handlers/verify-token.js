@@ -112,48 +112,6 @@ module.exports = async (req, res, next) => {
   				throw new Error(`API Key not valid ${apiKey}`);
   			}
   		}
-
-      if(process.env.urlTokenAuth.trim().toLowerCase() === 'true' && process.env.urlTokenQueryParam) {
-        const token = req.query[process.env.urlTokenQueryParam];
-        if(!token || token.length < 10) {
-          throw new Error('Invalid token length for "' + tok + '"');
-        }
-
-        const signingKey = await getSigningKey(token);
-        const options = {
-          ignoreExpiration: false,
-          maxAge: '15m',
-          algorithms: ['RS256']
-        };
-        const claimPath = process.env.AccessClaimPath;
-
-        jwt.verify(token, signingKey, options, (err, vdecoded) => {
-          if(err) {
-            throw new Error('Could not verify token');
-          }
-
-          req.access_token = token;
-          req.userData = vdecoded;
-          req.userAccess = vdecoded[claimPath];
-
-          let found = 0;
-          if((process.env.AccessRolesAllowed).includes(',')) {
-            (process.env.AccessRolesAllowed).split(',').forEach((item) => {
-              if(req.userAccess.indexOf(item.trim()) !== -1){
-                found = 1;
-              }
-            });
-          } else if(req.userAccess.indexOf(process.env.AccessRolesAllowed.trim()) !== -1){
-                found = 1;
-          }
-
-          if(found === 0) {
-            throw new Error('Roles not found!' + JSON.stringify(vdecoded));
-          }
-
-          audit.info('Audit Success: ' + JSON.stringify(vdecoded))
-        });
-      }
     } catch (err) {
 			audit.error(`Audit Failure: ${JSON.stringify(err)}`);
 			logger.error(JSON.stringify(err));

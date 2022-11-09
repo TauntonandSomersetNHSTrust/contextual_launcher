@@ -37,38 +37,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
     writable: true
 });
 
-
-//Setup CORS
-let corsOptions = {};
-if(process.env.corsEnabled.toLowerCase() === 'true'){
-	let whitelist = [];
-	if((process.env.allowedOrigins).includes(',')) {
-		(process.env.allowedOrigins).split(',').forEach(function (item) {
-			whitelist.push(item.trim());
-		});
-	} else {
-		whitelist.push(process.env.allowedOrigins);
-	}
-
-	logger.system('Current acceptable CORS addresses: ' + whitelist)
-	corsOptions = {
-	  origin: function (origin, callback) {
-			console.log('origin: ', origin);
-			const index = whitelist.findIndex((w) => {
-				return origin && origin.startsWith(w);
-			})
-
-			if (index > -1) {
-				callback(null, true);
-			} else {
-				callback(new Error('CORS failed'));
-			}
-	  }
-	}
-}
-
 // Middleware
-server.use(cors(corsOptions));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({extended: false}));
 

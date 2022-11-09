@@ -9,6 +9,7 @@ module.exports = class InMemoryLogTransport extends Transport {
   constructor(opts) {
     super(opts);
 		this.max = 100;
+    this.index = 0;
 		this.lock = false;
 		if(opts.max && !isNaN(opts.max)) {
 			this.max = opts.max;
@@ -18,8 +19,8 @@ module.exports = class InMemoryLogTransport extends Transport {
 			this.level = opts.level;
 		}
 
-		this.queue = [];
-		this.cache = [];
+		this.queue = new Array(this.max);
+    this.cache = [];
   }
 
   log(info, callback) {
@@ -27,44 +28,44 @@ module.exports = class InMemoryLogTransport extends Transport {
       this.emit('logged', info);
     });
 
-		this.queue.push(info);
+		this.queue[this.index++] = info;
+
+    if(this.index >= this.max) {
+      this.index = 0;
+    }
 
     callback();
   }
 
 	getLogAsync(nLines) {
 		return new Promise((resolve, reject) => {
-			if(this.lock) {
-				return resolve(this.cache);
-			}
-
-			this.lock = true;
 
 			if(nLines > this.max) {
 				nLines = this.max;
 			}
 
-			while(this.queue.length > this.max) {
-				this.queue.shift();
-			}
+      const temp = [...this.queue];
+      let cIndex = this.index;
+      let linear = [];
+      for(let i = cIndex; i < this.max; i++) {
+          if(temp[i] != undefined) {
+            linear.push(temp[i])
+          }
+      }
 
-			if(nLines >= this.queue.length) {
-				this.cache = this.queue.slice(this.queue.length - nLines).map((l) => {
-					return l.timestamp + ' ' + l.level + ' [' + l.label + '] ' + l.message;
-				});
-				resolve(this.cache);
-				this.lock = false;
-				return;
-			}
+      for(let i = 0; i < cIndex; i++) {
+          if(temp[i] != undefined) {
+            linear.push(temp[i])
+          }
+      }
 
-			this.cache = this.queue.slice(this.queue.length - nLines).map((l) => {
-				return l.timestamp + ' ' + l.level + ' [' + l.label + '] ' + l.message;
-			});
-			resolve(this.cache);
-			this.lock = false;
+      if(linear.length <= nLines) {
+        return resolve(linear);
+      }
+
+      return resolve(linear.splice(0, nLines));
 		}).catch((ex) => {
-			this.lock = false;
-      return;
+      return ['Error in log cache'];
 		});
 	}
 };
