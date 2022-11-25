@@ -167,7 +167,7 @@ logger.logLevelTester = () => {
 	logLevelTest('error');
 	logLevelTest('warn');
 	logLevelTest('info');
-	logLevelTest('auth')
+	logLevelTest('auth');
 	logLevelTest('debug');
 	logLevelTest('calls');
 
@@ -201,7 +201,7 @@ logger.getCurrentLogFileAsync = () => {
 		  return resolve(arr);
 		});
 	});
-}
+};
 
 logger.getInfoMemoryLogAsync = async (nLines) => {
 	return await memLogTransportInfo.getLogAsync(nLines);
