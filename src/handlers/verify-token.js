@@ -66,7 +66,7 @@ module.exports = async (req, res, next) => {
 
   					for(let i = 0; i < aClaims.length; i++) {
   						logger.debug('Claims: ' + aClaims[i]);
-  						claim = aClaims[i];
+  						const claim = aClaims[i];
   						access = _.get(vdecoded, claim);
   						if(access != null) {
   							logger.debug('Got one!');
