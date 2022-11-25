@@ -91,7 +91,7 @@ const getWholeLogFile = async (req, res, next) => {
 };
 
 async function tailLog(level, lines) {
-	message = 'Tail OK';
+	let message = 'Tail OK';
 	let data = [];
 	let status = 200;
 	try {
