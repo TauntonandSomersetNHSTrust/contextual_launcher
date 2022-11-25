@@ -16,9 +16,11 @@
     "jwks-rsa": "^2.1.5",
     "lodash": "^4.17.21",
     "nocache": "^3.0.4",
-    "nodemon": "^2.0.20",
     "querystring": "^0.2.1",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
