@@ -46,7 +46,7 @@ router.get('/launch', verifyToken, tokenExchange, obfuscate, asyncMiddleware(lau
 // router.post('/login/*', asyncMiddleware(openIDLogin));
 router.use('/status', asyncMiddleware((req, res, next) => {
   return res.json('OK').status(200);
-}))
+}));
 
 //Tests
 router.get('/test', asyncMiddleware(testEndpoint));
